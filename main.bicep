@@ -65,12 +65,12 @@ module appPlanDeploy 'appPlan.bicep' = {
 }
 
 // Deployment - Front Door
-module frontDoorDeploy 'frontDoor.bicep' = {
-  name: 'frontDoorDeploy'
-  scope: resourceGroup
-  params:{
-    environment:environment
-    appName:appName
-    region:resourceGroup.location
-  }
-}
+// module frontDoorDeploy 'frontDoor.bicep' = {
+//   name: 'frontDoorDeploy'
+//   scope: resourceGroup
+//   params:{
+//     environment:environment
+//     appName:appName
+//     backendHostUrl:appPlanDeploy.outputs.hostUrl
+//   }
+// }
