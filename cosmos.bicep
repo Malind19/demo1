@@ -18,5 +18,6 @@ resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2021-06-15' = {
         isZoneRedundant: false
       }
     ]
+    isVirtualNetworkFilterEnabled:true
   }
 }

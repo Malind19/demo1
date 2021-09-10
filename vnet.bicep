@@ -29,6 +29,14 @@ param subnets array = [
     name: subnetName_appPlan
     properties: {
       addressPrefix: '192.168.4.64/27'
+      delegations:[
+        {
+          name:'delegation'
+          properties: {
+            serviceName: 'Microsoft.Web/serverfarms'
+          }
+        }
+      ]
     }
   }
   {

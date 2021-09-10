@@ -61,6 +61,8 @@ module appPlanDeploy 'appPlan.bicep' = {
     environment:environment
     appName:appName
     region:resourceGroup.location
+    vNetName:vNetDeploy.outputs.name
+    subnetName:subnetName_appPlan
   }
 }
 
