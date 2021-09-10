@@ -1,9 +1,9 @@
-//  Globally inherited params
+// Imported params
 param environment  string
 param appName  string
-
-// Resource specific params
 param region string = resourceGroup().location
+
+// Local params
 param sku  string = 'B1'
 
 resource  appPlan 'Microsoft.Web/serverfarms@2021-01-15' ={
