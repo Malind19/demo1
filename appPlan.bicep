@@ -24,6 +24,7 @@ resource apiAppService 'Microsoft.Web/sites@2020-06-01' = {
   location: region
   properties: {
     serverFarmId: appPlan.id
+    httpsOnly:true
     siteConfig: {
       linuxFxVersion: linuxFxVersion
     }
@@ -35,6 +36,7 @@ resource wfeAppService 'Microsoft.Web/sites@2020-06-01' = {
   location: region
   properties: {
     serverFarmId: appPlan.id
+    httpsOnly:true
     siteConfig: {
       linuxFxVersion: linuxFxVersion
     }

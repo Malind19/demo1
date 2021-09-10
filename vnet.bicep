@@ -2,6 +2,10 @@
 param environment  string
 param appName  string
 param region string = resourceGroup().location
+param subnetName_cosmosDb  string
+param subnetName_acRegistry  string
+param subnetName_appPlan  string
+param subnetName_fontDoor  string
 
 // Local params
 param addressSpaces array = [
@@ -10,25 +14,25 @@ param addressSpaces array = [
 
 param subnets array = [
   {
-    name: 'subnet-cosmosdb'
+    name: subnetName_cosmosDb
     properties: {
       addressPrefix: '192.168.4.0/27'
     }
   }
   {
-    name: 'subnet-acregistry'
+    name: subnetName_acRegistry
     properties: {
       addressPrefix: '192.168.4.32/27'
     }
   }
   {
-    name: 'subnet-appplan'
+    name: subnetName_appPlan
     properties: {
       addressPrefix: '192.168.4.64/27'
     }
   }
   {
-    name: 'subnet-frontdoor'
+    name: subnetName_fontDoor
     properties: {
       addressPrefix: '192.168.4.96/27'
     }
@@ -47,5 +51,5 @@ resource vNet 'Microsoft.Network/virtualNetworks@2021-02-01' ={
   }
 }
 
-output name string = vNet.name
 output id string = vNet.id
+output name string = vNet.name
