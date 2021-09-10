@@ -10,6 +10,19 @@ steps:
     Contents: 'azuredeploy*'
     TargetFolder: '$(build.artifactstagingdirectory)'
 
+- task: AzureCLI@2  
+  displayName: 'build bicep artifact' 
+  inputs: 
+    azureSubscription: 'AZDevOpsPrincipal' 
+    scriptType: 'pscore'  
+    scriptLocation: 'inlineScript'  
+    inlineScript: 'az bicep build --file main.bicep'
+
+- task: CopyFiles@2
+  inputs:
+    Contents: '*.json'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
