@@ -5,10 +5,11 @@ param environment  string
 param appName  string
 
 // Parameters - Constants
-param subnetName_cosmosDb  string = 'subnet-cosmosdb'
-param subnetName_acRegistry  string = 'subnet-acregistry'
-param subnetName_appPlan  string = 'subnet-appplan'
-param subnetName_fontDoor  string = 'subnet-frontdoor'
+param subnetName_CosmosDb  string = 'subnet-cosmosdb'
+param subnetName_ACRegistry  string = 'subnet-acregistry'
+param subnetName_ApiApp  string = 'subnet-apiapp'
+param subnetName_WfeApp  string = 'subnet-wfeapp'
+param subnetName_FontDoor  string = 'subnet-frontdoor'
 
 // Deployment- Resource Group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
@@ -24,10 +25,11 @@ module vNetDeploy 'vnet.bicep' = {
     environment:environment
     appName:appName
     region:resourceGroup.location
-    subnetName_cosmosDb:subnetName_cosmosDb
-    subnetName_acRegistry:subnetName_acRegistry
-    subnetName_appPlan:subnetName_appPlan
-    subnetName_fontDoor:subnetName_fontDoor
+    subnetName_CosmosDb:subnetName_CosmosDb
+    subnetName_ACRegistry:subnetName_ACRegistry
+    subnetName_ApiApp:subnetName_ApiApp
+    subnetName_WfeApp:subnetName_WfeApp
+    subnetName_FontDoor:subnetName_FontDoor
   }
 }
 
@@ -62,7 +64,8 @@ module appPlanDeploy 'appPlan.bicep' = {
     appName:appName
     region:resourceGroup.location
     vNetName:vNetDeploy.outputs.name
-    subnetName:subnetName_appPlan
+    subnetName_ApiApp:subnetName_ApiApp
+    subnetName_WfeApp:subnetName_WfeApp
   }
 }
 

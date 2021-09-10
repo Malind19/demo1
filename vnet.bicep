@@ -2,10 +2,11 @@
 param environment  string
 param appName  string
 param region string = resourceGroup().location
-param subnetName_cosmosDb  string
-param subnetName_acRegistry  string
-param subnetName_appPlan  string
-param subnetName_fontDoor  string
+param subnetName_CosmosDb  string
+param subnetName_ACRegistry  string
+param subnetName_ApiApp  string
+param subnetName_WfeApp  string
+param subnetName_FontDoor  string
 
 // Local params
 param addressSpaces array = [
@@ -14,19 +15,19 @@ param addressSpaces array = [
 
 param subnets array = [
   {
-    name: subnetName_cosmosDb
+    name: subnetName_CosmosDb
     properties: {
       addressPrefix: '192.168.4.0/27'
     }
   }
   {
-    name: subnetName_acRegistry
+    name: subnetName_ACRegistry
     properties: {
       addressPrefix: '192.168.4.32/27'
     }
   }
   {
-    name: subnetName_appPlan
+    name: subnetName_ApiApp
     properties: {
       addressPrefix: '192.168.4.64/27'
       delegations:[
@@ -40,9 +41,23 @@ param subnets array = [
     }
   }
   {
-    name: subnetName_fontDoor
+    name: subnetName_WfeApp
     properties: {
       addressPrefix: '192.168.4.96/27'
+      delegations:[
+        {
+          name:'delegation'
+          properties: {
+            serviceName: 'Microsoft.Web/serverfarms'
+          }
+        }
+      ]
+    }
+  }
+  {
+    name: subnetName_FontDoor
+    properties: {
+      addressPrefix: '192.168.4.128/27'
     }
   }
 ]

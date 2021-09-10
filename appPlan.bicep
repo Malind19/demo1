@@ -3,7 +3,8 @@ param environment  string
 param appName  string
 param region string = resourceGroup().location
 param vNetName  string
-param subnetName  string
+param subnetName_ApiApp  string
+param subnetName_WfeApp  string
 
 // Local params
 param sku  string = 'P1V2'
@@ -21,7 +22,7 @@ resource  appPlan 'Microsoft.Web/serverfarms@2021-01-15' ={
   }
 } 
 
-resource apiAppService 'Microsoft.Web/sites@2020-06-01' = {
+resource apiAppService 'Microsoft.Web/sites@2021-01-15' = {
   name: 'app-${appName}-${environment}-api'
   location: region
   properties: {
@@ -29,7 +30,9 @@ resource apiAppService 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly:true
     siteConfig: {
       linuxFxVersion: linuxFxVersion
+      vnetRouteAllEnabled:true
     }
+    virtualNetworkSubnetId:'/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Network/virtualNetworks/${vNetName}/subnets/${subnetName_ApiApp}'
   }
 }
 
@@ -43,7 +46,7 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
       linuxFxVersion: linuxFxVersion
       vnetRouteAllEnabled:true
     }
-    virtualNetworkSubnetId:'/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Network/virtualNetworks/${vNetName}/subnets/${subnetName}'
+    virtualNetworkSubnetId:'/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Network/virtualNetworks/${vNetName}/subnets/${subnetName_WfeApp}'
   }
 }
 
