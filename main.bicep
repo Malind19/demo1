@@ -15,7 +15,7 @@ var subnetName_WfeAppConnect = 'subnet-wfeappconnect'
 var subnetName_ACRegistry = 'subnet-acregistry'
 var subnetName_FontDoor = 'subnet-frontdoor'
 var resourceGroupName  = 'rg-${appName}-${environment}'
-var vnetName  = 'vnet-${environment}-${deployment().location}-${appName}'
+var vnetName  = 'vnet-${environment}-${appName}'
 
 
 // Deployment- Resource Group
