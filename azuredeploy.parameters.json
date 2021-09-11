@@ -7,6 +7,9 @@
       },
       "appName": {
         "value": "#param_appName#"
+      },
+      "includeNetworkSecurity": {
+        "value": "#param_includeNetworkSecurity#"
       }
     }
   }
