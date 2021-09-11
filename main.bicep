@@ -3,7 +3,8 @@ targetScope = 'subscription'
 // Parameters - Common
 param environment  string
 param appName  string
-param includeNetworkSecurity  bool
+param includeNetworkSecurity  string
+var includeSecurity  = includeNetworkSecurity=='true'
 
 // Variables - Resource Names
 var subnetName_CosmosExpose  = 'subnet-cosmosexpose'
@@ -49,7 +50,7 @@ module appPlanDeploy 'modules/appPlan.bicep' = {
   params:{
     environment:environment
     appName:appName
-    includeNetworkSecurity:includeNetworkSecurity
+    includeNetworkSecurity:includeSecurity
     region:resourceGroup.location
     virtualNetworkName:vnetName
     subnetName:subnetName_ApiAppPvtEndpoint
@@ -69,7 +70,7 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     virtualNetworkName:vnetName
     subnetName:subnetName_CosmosPvtEndpoint
     apiAppPrincipalId:appPlanDeploy.outputs.apiAppPrincipalId
-    includeNetworkSecurity:includeNetworkSecurity
+    includeNetworkSecurity:includeSecurity
   }
 }
 
@@ -85,7 +86,7 @@ module acRegistryDeploy 'modules/acRegistry.bicep' = {
 }
 
 // Deployment - Front Door
-module frontDoorDeploy 'modules/frontDoor.bicep' = {
+module frontDoorDeploy 'modules/frontDoor.bicep' = if(includeSecurity) {
   name: 'frontDoorDeploy'
   scope: resourceGroup
   params: {
