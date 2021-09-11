@@ -25,6 +25,9 @@ resource  appPlan 'Microsoft.Web/serverfarms@2021-01-15' ={
 resource apiAppService 'Microsoft.Web/sites@2021-01-15' = {
   name: 'app-${appName}-${environment}-api'
   location: region
+  identity:{
+    type:'SystemAssigned'
+  }
   properties: {
     serverFarmId: appPlan.id
     httpsOnly:true
@@ -51,3 +54,4 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
 }
 
 output hostUrl string = wfeAppService.properties.defaultHostName
+output apiAppPrincipalId string = apiAppService.identity.principalId

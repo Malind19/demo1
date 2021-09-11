@@ -35,6 +35,20 @@ module vNetDeploy 'modules/vnet.bicep' = {
 }
 
 // Deployment - App Service Plan
+module appPlanDeploy 'modules/appPlan.bicep' = {
+  name: 'appPlanDeploy'
+  scope: resourceGroup
+  params:{
+    environment:environment
+    appName:appName
+    region:resourceGroup.location
+    vNetName:vNetDeploy.outputs.name
+    subnetName_ApiApp:subnetName_ApiApp
+    subnetName_WfeApp:subnetName_WfeApp
+  }
+}
+
+// Deployment - Cosmos DB
 module cosmosDbDeploy 'modules/cosmos.bicep' = {
   name: 'cosmosDbDeploy'
   scope: resourceGroup
@@ -44,6 +58,7 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     region:resourceGroup.location
     virtualNetworkId:vNetDeploy.outputs.id
     subnetId:vNetDeploy.outputs.id_subnet_cosmosdb
+    apiAppPrincipalId:appPlanDeploy.outputs.apiAppPrincipalId
     includeNetworkSecurity:includeNetworkSecurity
   }
 }
@@ -56,20 +71,6 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
 //     environment:environment
 //     appName:appName
 //     region:resourceGroup.location
-//   }
-// }
-
-// // Deployment - App Service Plan
-// module appPlanDeploy 'appPlan.bicep' = {
-//   name: 'appPlanDeploy'
-//   scope: resourceGroup
-//   params:{
-//     environment:environment
-//     appName:appName
-//     region:resourceGroup.location
-//     vNetName:vNetDeploy.outputs.name
-//     subnetName_ApiApp:subnetName_ApiApp
-//     subnetName_WfeApp:subnetName_WfeApp
 //   }
 // }
 

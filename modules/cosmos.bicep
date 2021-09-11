@@ -6,6 +6,7 @@ param includeNetworkSecurity  bool
 param region string = resourceGroup().location
 param subnetId  string
 param virtualNetworkId  string
+param apiAppPrincipalId  string
 
 // Local params
 param employeeContainerName string = 'Employees'
@@ -13,6 +14,14 @@ param privateEndpointName string = 'pe-cosmos-${appName}-${environment}'
 param tags object = {
   'deploymentGroup':'cosmosdb'
 }
+
+var roleDefinitionId = guid('sql-role-definition-', apiAppPrincipalId, cosmosDbAccount.id)
+var roleAssignmentId = guid(roleDefinitionId, apiAppPrincipalId, cosmosDbAccount.id)
+var roleDefinitionName = 'Cosmos_ReadWrite'
+param dataActions array = [
+  'Microsoft.DocumentDB/databaseAccounts/readMetadata'
+  'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*'
+]
 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2021-06-15' = {
   name: 'cosmos-${appName}-${environment}'
@@ -32,6 +41,31 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2021-06-15' = {
         isZoneRedundant: false
       }
     ]
+  }
+}
+
+resource sqlRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2021-04-15' = {
+  name: '${cosmosDbAccount.name}/${roleDefinitionId}'
+  properties: {
+    roleName: roleDefinitionName
+    type: 'CustomRole'
+    assignableScopes: [
+      cosmosDbAccount.id
+    ]
+    permissions: [
+      {
+        dataActions: dataActions
+      }
+    ]
+  }
+}
+
+resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2021-04-15' = {
+  name: '${cosmosDbAccount.name}/${roleAssignmentId}'
+  properties: {
+    roleDefinitionId: sqlRoleDefinition.id
+    principalId: apiAppPrincipalId
+    scope: cosmosDbAccount.id
   }
 }
 
@@ -177,3 +211,6 @@ resource privateEndpoints_dnsZoneGroup 'Microsoft.Network/privateEndpoints/priva
     ]
   }
 }
+
+output sqlRoleAssignmentId string = sqlRoleAssignment.id
+output sqlRoleDefinitionId string = sqlRoleDefinition.id
