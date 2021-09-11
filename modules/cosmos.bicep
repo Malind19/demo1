@@ -4,8 +4,6 @@ param appName  string
 param includeNetworkSecurity  bool
 
 param region string = resourceGroup().location
-param subnetName  string
-param virtualNetworkName  string
 param virtualNetworkId  string
 param apiAppPrincipalId  string
 
@@ -16,7 +14,7 @@ param tags object = {
   'deploymentGroup':'cosmosdb'
 }
 
-var subnetId = '/subscriptions/${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Network/virtualNetworks/${virtualNetworkName}/subnets/${subnetName}'
+param subnetId  string
 var roleDefinitionId = guid('sql-role-definition-', apiAppPrincipalId, cosmosDbAccount.id)
 var roleAssignmentId = guid(roleDefinitionId, apiAppPrincipalId, cosmosDbAccount.id)
 var roleDefinitionName = 'Cosmos_ReadWrite'

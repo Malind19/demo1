@@ -73,5 +73,18 @@ resource vNet 'Microsoft.Network/virtualNetworks@2021-02-01' ={
   }
 }
 
+resource subnet_cosmosdb 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = {
+  parent: vNet
+  name: 'subnet-cosmosdb'
+  properties: {
+    addressPrefix: '192.168.4.0/27'
+    delegations: []
+    privateEndpointNetworkPolicies: 'Disabled'
+    privateLinkServiceNetworkPolicies: 'Enabled'
+  }
+}
+
 output id string = vNet.id
 output name string = vNet.name
+
+output id_subnet_cosmosdb string = subnet_cosmosdb.id
