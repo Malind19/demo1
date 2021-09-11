@@ -1,6 +1,8 @@
 // Imported params
 param environment  string
 param appName  string
+param includeNetworkSecurity  bool
+
 param region string = resourceGroup().location
 param subnetId  string
 param virtualNetworkId  string
@@ -65,13 +67,13 @@ resource employeesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
   }
 }
 
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2018-09-01' = if (includeNetworkSecurity) {
   name: 'privatelink.documents.azure.com'
   tags:tags
   location: 'global'
 }
 
-resource privateDnsZones_privatelink 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
+resource privateDnsZones_privatelink 'Microsoft.Network/privateDnsZones/A@2018-09-01' = if (includeNetworkSecurity) {
   parent: privateDnsZone
   name: 'cosmos-${appName}-${environment}'
   properties: {
@@ -87,7 +89,7 @@ resource privateDnsZones_privatelink 'Microsoft.Network/privateDnsZones/A@2018-0
   }
 }
 
-resource privateDnsZones_privatelink_region 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
+resource privateDnsZones_privatelink_region 'Microsoft.Network/privateDnsZones/A@2018-09-01' = if (includeNetworkSecurity) {
   parent: privateDnsZone
   name: 'cosmos-${appName}-${environment}-${region}'
   properties: {
@@ -103,7 +105,7 @@ resource privateDnsZones_privatelink_region 'Microsoft.Network/privateDnsZones/A
   }
 }
 
-resource Microsoft_Network_privateDnsZones_SOA 'Microsoft.Network/privateDnsZones/SOA@2018-09-01' = {
+resource Microsoft_Network_privateDnsZones_SOA 'Microsoft.Network/privateDnsZones/SOA@2018-09-01' = if (includeNetworkSecurity) {
   parent: privateDnsZone
   name: '@'
   properties: {
@@ -120,7 +122,7 @@ resource Microsoft_Network_privateDnsZones_SOA 'Microsoft.Network/privateDnsZone
   }
 }
 
-resource privateDnsZones_vNetLinks 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
+resource privateDnsZones_vNetLinks 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = if (includeNetworkSecurity) {
   parent: privateDnsZone
   tags:tags
   name: 'lr67zpu3hc6ei'
@@ -133,7 +135,7 @@ resource privateDnsZones_vNetLinks 'Microsoft.Network/privateDnsZones/virtualNet
   }
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-11-01' = {
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-11-01' =  if (includeNetworkSecurity) {
   name: privateEndpointName
   tags:tags
   location: 'eastus'
@@ -161,7 +163,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-11-01' = {
   }
 }
 
-resource privateEndpoints_dnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-11-01' = {
+resource privateEndpoints_dnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-11-01' = if (includeNetworkSecurity) {
   parent: privateEndpoint
   name: 'default'
   properties: {

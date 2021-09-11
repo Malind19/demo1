@@ -3,6 +3,7 @@ targetScope = 'subscription'
 // Parameters - Common
 param environment  string
 param appName  string
+param includeNetworkSecurity  bool
 
 // Parameters - Constants
 param subnetName_CosmosDb  string = 'subnet-cosmosdb'
@@ -43,6 +44,7 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     region:resourceGroup.location
     virtualNetworkId:vNetDeploy.outputs.id
     subnetId:vNetDeploy.outputs.id_subnet_cosmosdb
+    includeNetworkSecurity:includeNetworkSecurity
   }
 }
 
