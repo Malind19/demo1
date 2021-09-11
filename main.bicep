@@ -19,7 +19,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
 }
 
 // Deployment - Virtual Network
-module vNetDeploy 'vnet.bicep' = {
+module vNetDeploy 'modules/vnet.bicep' = {
   name: 'vNetDeploy'
   scope: resourceGroup
   params:{
