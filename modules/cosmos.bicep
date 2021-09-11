@@ -85,7 +85,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = if(in
     }
     privateLinkServiceConnections: [
       {
-        name: 'MyConnection'
+        name: 'plsConnection'
         properties: {
           privateLinkServiceId: cosmosDbAccount.id
           groupIds: [

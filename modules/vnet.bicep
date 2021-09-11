@@ -46,6 +46,7 @@ param subnets array = [
     name: subnetName_ApiAppPvtEndpoint
     properties: {
       addressPrefix: '192.168.4.96/27'
+      privateEndpointNetworkPolicies:'Disabled'
     }
   }
   {

@@ -5,14 +5,14 @@ param environment  string
 param appName  string
 param includeNetworkSecurity  bool
 
-// Parameters - Resource Names
-param subnetName_CosmosExpose  string = 'subnet-cosmosexpose'
-param subnetName_CosmosPvtEndpoint  string = 'subnet-cosmospvtendpoint'
-param subnetName_ApiAppConnect  string = 'subnet-apiappconnect'
-param subnetName_ApiAppPvtEndpoint  string = 'subnet-apiapppvtendpoint'
-param subnetName_WfeAppConnect  string = 'subnet-wfeappconnect'
-param subnetName_ACRegistry  string = 'subnet-acregistry'
-param subnetName_FontDoor  string = 'subnet-frontdoor'
+// Variables - Resource Names
+var subnetName_CosmosExpose  = 'subnet-cosmosexpose'
+var subnetName_CosmosPvtEndpoint = 'subnet-cosmospvtendpoint'
+var subnetName_ApiAppConnect = 'subnet-apiappconnect'
+var subnetName_ApiAppPvtEndpoint = 'subnet-apiapppvtendpoint'
+var subnetName_WfeAppConnect = 'subnet-wfeappconnect'
+var subnetName_ACRegistry = 'subnet-acregistry'
+var subnetName_FontDoor = 'subnet-frontdoor'
 var resourceGroupName  = 'rg-${appName}-${environment}'
 var vnetName  = 'vnet-${environment}-${deployment().location}-${appName}'
 
@@ -47,6 +47,8 @@ module appPlanDeploy 'modules/appPlan.bicep' = {
     environment:environment
     appName:appName
     region:resourceGroup.location
+    virtualNetworkName:vnetName
+    subnetName:subnetName_ApiAppPvtEndpoint
     subnetId_ApiAppConnect:vNetDeploy.outputs.subnetId_ApiAppConnect
     subnetId_WfeAppConnect:vNetDeploy.outputs.subnetId_WfeAppConnect
   }
@@ -67,16 +69,16 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
   }
 }
 
-// // Deployment - Container Registry
-// module acRegistryDeploy 'acRegistry.bicep' = {
-//   name: 'acRegistryDeploy'
-//   scope: resourceGroup
-//   params:{
-//     environment:environment
-//     appName:appName
-//     region:resourceGroup.location
-//   }
-// }
+// Deployment - Container Registry
+module acRegistryDeploy 'modules/acRegistry.bicep' = {
+  name: 'acRegistryDeploy'
+  scope: resourceGroup
+  params:{
+    environment:environment
+    appName:appName
+    region:resourceGroup.location
+  }
+}
 
 // Deployment - Front Door
 // module frontDoorDeploy 'frontDoor.bicep' = {

@@ -4,10 +4,13 @@ param appName  string
 param region string = resourceGroup().location
 param subnetId_ApiAppConnect  string
 param subnetId_WfeAppConnect  string
+param subnetName  string
+param virtualNetworkName  string
 
 // Local params
 param sku  string = 'P1V2'
 param linuxFxVersion string = 'node|14-lts'
+param privateEndpointName string = 'pe-apiapp-${appName}-${environment}'
 
 resource  appPlan 'Microsoft.Web/serverfarms@2021-01-15' ={
   name:'plan-${environment}-${region}-${appName}'
@@ -49,6 +52,27 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
       vnetRouteAllEnabled:true
     }
     virtualNetworkSubnetId:subnetId_WfeAppConnect
+  }
+}
+
+resource apiAppPrivateNetwork 'Microsoft.Network/privateEndpoints@2021-02-01' =  {
+  name: privateEndpointName
+  location: region
+  properties:{
+    privateLinkServiceConnections:[
+      {
+        name:'plsConnection'
+        properties:{
+          privateLinkServiceId:apiAppService.id
+          groupIds:[
+            'sites'
+          ]
+        }
+      }
+    ]
+    subnet: {
+      id: resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, subnetName)
+    }
   }
 }
 
