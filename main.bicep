@@ -34,40 +34,42 @@ module vNetDeploy 'vnet.bicep' = {
 }
 
 // Deployment - App Service Plan
-module cosmosDbDeploy 'cosmos.bicep' = {
+module cosmosDbDeploy 'modules/cosmos.bicep' = {
   name: 'cosmosDbDeploy'
   scope: resourceGroup
   params:{
     environment:environment
     appName:appName
     region:resourceGroup.location
+    virtualNetworkName:vNetDeploy.name
+    subnetName:subnetName_CosmosDb
   }
 }
 
-// Deployment - Container Registry
-module acRegistryDeploy 'acRegistry.bicep' = {
-  name: 'acRegistryDeploy'
-  scope: resourceGroup
-  params:{
-    environment:environment
-    appName:appName
-    region:resourceGroup.location
-  }
-}
+// // Deployment - Container Registry
+// module acRegistryDeploy 'acRegistry.bicep' = {
+//   name: 'acRegistryDeploy'
+//   scope: resourceGroup
+//   params:{
+//     environment:environment
+//     appName:appName
+//     region:resourceGroup.location
+//   }
+// }
 
-// Deployment - App Service Plan
-module appPlanDeploy 'appPlan.bicep' = {
-  name: 'appPlanDeploy'
-  scope: resourceGroup
-  params:{
-    environment:environment
-    appName:appName
-    region:resourceGroup.location
-    vNetName:vNetDeploy.outputs.name
-    subnetName_ApiApp:subnetName_ApiApp
-    subnetName_WfeApp:subnetName_WfeApp
-  }
-}
+// // Deployment - App Service Plan
+// module appPlanDeploy 'appPlan.bicep' = {
+//   name: 'appPlanDeploy'
+//   scope: resourceGroup
+//   params:{
+//     environment:environment
+//     appName:appName
+//     region:resourceGroup.location
+//     vNetName:vNetDeploy.outputs.name
+//     subnetName_ApiApp:subnetName_ApiApp
+//     subnetName_WfeApp:subnetName_WfeApp
+//   }
+// }
 
 // Deployment - Front Door
 // module frontDoorDeploy 'frontDoor.bicep' = {
