@@ -2,9 +2,8 @@
 param environment  string
 param appName  string
 param region string = resourceGroup().location
-param vNetName  string
-param subnetName_ApiApp  string
-param subnetName_WfeApp  string
+param subnetId_ApiAppConnect  string
+param subnetId_WfeAppConnect  string
 
 // Local params
 param sku  string = 'P1V2'
@@ -35,7 +34,7 @@ resource apiAppService 'Microsoft.Web/sites@2021-01-15' = {
       linuxFxVersion: linuxFxVersion
       vnetRouteAllEnabled:true
     }
-    virtualNetworkSubnetId:'/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Network/virtualNetworks/${vNetName}/subnets/${subnetName_ApiApp}'
+    virtualNetworkSubnetId:subnetId_ApiAppConnect
   }
 }
 
@@ -49,7 +48,7 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
       linuxFxVersion: linuxFxVersion
       vnetRouteAllEnabled:true
     }
-    virtualNetworkSubnetId:'/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Network/virtualNetworks/${vNetName}/subnets/${subnetName_WfeApp}'
+    virtualNetworkSubnetId:subnetId_WfeAppConnect
   }
 }
 

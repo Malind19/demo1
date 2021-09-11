@@ -6,10 +6,12 @@ param appName  string
 param includeNetworkSecurity  bool
 
 // Parameters - Resource Names
-param subnetName_CosmosDb  string = 'subnet-cosmosdb'
+param subnetName_CosmosExpose  string = 'subnet-cosmosexpose'
+param subnetName_CosmosPvtEndpoint  string = 'subnet-cosmospvtendpoint'
+param subnetName_ApiAppConnect  string = 'subnet-apiappconnect'
+param subnetName_ApiAppPvtEndpoint  string = 'subnet-apiapppvtendpoint'
+param subnetName_WfeAppConnect  string = 'subnet-wfeappconnect'
 param subnetName_ACRegistry  string = 'subnet-acregistry'
-param subnetName_ApiApp  string = 'subnet-apiapp'
-param subnetName_WfeApp  string = 'subnet-wfeapp'
 param subnetName_FontDoor  string = 'subnet-frontdoor'
 var resourceGroupName  = 'rg-${appName}-${environment}'
 var vnetName  = 'vnet-${environment}-${deployment().location}-${appName}'
@@ -28,10 +30,12 @@ module vNetDeploy 'modules/vnet.bicep' = {
   params:{
     region:resourceGroup.location
     vnetName:vnetName
-    subnetName_CosmosDb:subnetName_CosmosDb
+    subnetName_CosmosExpose:subnetName_CosmosExpose
+    subnetName_CosmosPvtEndpoint:subnetName_CosmosPvtEndpoint
+    subnetName_ApiAppConnect:subnetName_ApiAppConnect
+    subnetName_ApiAppPvtEndpoint:subnetName_ApiAppPvtEndpoint
+    subnetName_WfeAppConnect:subnetName_WfeAppConnect
     subnetName_ACRegistry:subnetName_ACRegistry
-    subnetName_ApiApp:subnetName_ApiApp
-    subnetName_WfeApp:subnetName_WfeApp
     subnetName_FontDoor:subnetName_FontDoor
   }
 }
@@ -44,9 +48,8 @@ module appPlanDeploy 'modules/appPlan.bicep' = {
     environment:environment
     appName:appName
     region:resourceGroup.location
-    vNetName:vnetName
-    subnetName_ApiApp:subnetName_ApiApp
-    subnetName_WfeApp:subnetName_WfeApp
+    subnetId_ApiAppConnect:vNetDeploy.outputs.subnetId_ApiAppConnect
+    subnetId_WfeAppConnect:vNetDeploy.outputs.subnetId_WfeAppConnect
   }
 }
 
@@ -60,7 +63,7 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     region:resourceGroup.location
     virtualNetworkId:vNetId
     virtualNetworkName:vnetName
-    subnetName:subnetName_CosmosDb
+    subnetName:subnetName_CosmosExpose
     apiAppPrincipalId:appPlanDeploy.outputs.apiAppPrincipalId
     includeNetworkSecurity:includeNetworkSecurity
   }
