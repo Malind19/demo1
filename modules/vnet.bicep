@@ -25,6 +25,7 @@ param subnets array = [
     name: subnetName_CosmosPvtEndpoint
     properties: {
       addressPrefix: '192.168.4.32/27'
+      privateEndpointNetworkPolicies:'Disabled'
     }
   }
   {

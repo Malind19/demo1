@@ -15,7 +15,6 @@ param subnetName_ACRegistry  string = 'subnet-acregistry'
 param subnetName_FontDoor  string = 'subnet-frontdoor'
 var resourceGroupName  = 'rg-${appName}-${environment}'
 var vnetName  = 'vnet-${environment}-${deployment().location}-${appName}'
-var vNetId ='/subscriptions/${subscription().id}/resourceGroups/${resourceGroupName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
 
 // Deployment- Resource Group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
@@ -61,9 +60,8 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     environment:environment
     appName:appName
     region:resourceGroup.location
-    virtualNetworkId:vNetId
     virtualNetworkName:vnetName
-    subnetName:subnetName_CosmosExpose
+    subnetName:subnetName_CosmosPvtEndpoint
     apiAppPrincipalId:appPlanDeploy.outputs.apiAppPrincipalId
     includeNetworkSecurity:includeNetworkSecurity
   }
