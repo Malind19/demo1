@@ -71,45 +71,6 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
   location: 'global'
 }
 
-resource networkInterfaces 'Microsoft.Network/networkInterfaces@2020-11-01' = {
-  name: 'pe-cosmos-${appName}-${environment}.nic.2b37de64-c51a-46fd-ac3f-519dc69097e9'
-  tags:tags
-  location: region
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'Sql-cosmos-${appName}-${environment}.privateEndpoint'
-        properties: {
-          privateIPAddress: '192.168.4.4'
-          privateIPAllocationMethod: 'Dynamic'
-          subnet: {
-            id: subnetId
-          }
-          primary: true
-          privateIPAddressVersion: 'IPv4'
-        }
-      }
-      {
-        name: 'Sql-cosmos-${appName}-${environment}-eastus.privateEndpoint'
-        properties: {
-          privateIPAddress: '192.168.4.5'
-          privateIPAllocationMethod: 'Dynamic'
-          subnet: {
-            id: subnetId
-          }
-          primary: false
-          privateIPAddressVersion: 'IPv4'
-        }
-      }
-    ]
-    dnsSettings: {
-      dnsServers: []
-    }
-    enableAcceleratedNetworking: false
-    enableIPForwarding: false
-  }
-}
-
 resource privateDnsZones_privatelink 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
   parent: privateDnsZone
   name: 'cosmos-${appName}-${environment}'
