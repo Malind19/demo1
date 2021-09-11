@@ -64,7 +64,6 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     subnetName:subnetName_CosmosPvtEndpoint
     apiAppPrincipalId:appPlanDeploy.outputs.apiAppPrincipalId
     includeNetworkSecurity:includeNetworkSecurity
-    subnetId:vNetDeploy.outputs.id_subnet_cosmosdb
   }
 }
 
