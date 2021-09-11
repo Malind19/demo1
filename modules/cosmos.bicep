@@ -2,15 +2,19 @@
 param environment  string
 param appName  string
 param region string = resourceGroup().location
-param virtualNetworkName  string
-param subnetName  string
+param subnetId  string
+param virtualNetworkId  string
 
 // Local params
 param employeeContainerName string = 'Employees'
 param privateEndpointName string = 'pe-cosmos-${appName}-${environment}'
+param tags object = {
+  'deploymentGroup':'cosmosdb'
+}
 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2021-06-15' = {
   name: 'cosmos-${appName}-${environment}'
+  tags:tags
   location: region
   properties:{
     databaseAccountOfferType:'Standard'
@@ -31,6 +35,7 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2021-06-15' = {
 
 resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2021-06-15' = {
   name: '${cosmosDbAccount.name}/db-${appName}'
+  tags: tags
   dependsOn: [
     cosmosDbAccount
   ]
@@ -43,6 +48,7 @@ resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2021-06-15
 
 resource employeesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2021-06-15' = {
   name:'${cosmosDb.name}/${employeeContainerName}'
+  tags:tags
   dependsOn: [
     cosmosDbAccount
     cosmosDb
@@ -59,21 +65,150 @@ resource employeesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
   }
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: privateEndpointName
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+  name: 'privatelink.documents.azure.com'
+  tags:tags
+  location: 'global'
+}
+
+resource networkInterfaces 'Microsoft.Network/networkInterfaces@2020-11-01' = {
+  name: 'pe-cosmos-${appName}-${environment}.nic.2b37de64-c51a-46fd-ac3f-519dc69097e9'
+  tags:tags
   location: region
   properties: {
-    subnet: {
-      id: resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, subnetName)
+    ipConfigurations: [
+      {
+        name: 'Sql-cosmos-${appName}-${environment}.privateEndpoint'
+        properties: {
+          privateIPAddress: '192.168.4.4'
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: subnetId
+          }
+          primary: true
+          privateIPAddressVersion: 'IPv4'
+        }
+      }
+      {
+        name: 'Sql-cosmos-${appName}-${environment}-eastus.privateEndpoint'
+        properties: {
+          privateIPAddress: '192.168.4.5'
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: subnetId
+          }
+          primary: false
+          privateIPAddressVersion: 'IPv4'
+        }
+      }
+    ]
+    dnsSettings: {
+      dnsServers: []
     }
+    enableAcceleratedNetworking: false
+    enableIPForwarding: false
+  }
+}
+
+resource privateDnsZones_privatelink 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
+  parent: privateDnsZone
+  name: 'cosmos-${appName}-${environment}'
+  properties: {
+    metadata: {
+      creator: 'created by private endpoint via bicep'
+    }
+    ttl: 10
+    aRecords: [
+      {
+        ipv4Address: '192.168.4.4'
+      }
+    ]
+  }
+}
+
+resource privateDnsZones_privatelink_region 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
+  parent: privateDnsZone
+  name: 'cosmos-${appName}-${environment}-${region}'
+  properties: {
+    metadata: {
+      creator: 'created by private endpoint via bicep'
+    }
+    ttl: 10
+    aRecords: [
+      {
+        ipv4Address: '192.168.4.5'
+      }
+    ]
+  }
+}
+
+resource Microsoft_Network_privateDnsZones_SOA 'Microsoft.Network/privateDnsZones/SOA@2018-09-01' = {
+  parent: privateDnsZone
+  name: '@'
+  properties: {
+    ttl: 3600
+    soaRecord: {
+      email: 'azureprivatedns-host.microsoft.com'
+      expireTime: 2419200
+      host: 'azureprivatedns.net'
+      minimumTtl: 10
+      refreshTime: 3600
+      retryTime: 300
+      serialNumber: 1
+    }
+  }
+}
+
+resource privateDnsZones_vNetLinks 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
+  parent: privateDnsZone
+  tags:tags
+  name: 'lr67zpu3hc6ei'
+  location: 'global'
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: virtualNetworkId
+    }
+  }
+}
+
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-11-01' = {
+  name: privateEndpointName
+  tags:tags
+  location: 'eastus'
+  properties: {
     privateLinkServiceConnections: [
       {
-        name: 'MyConnection'
+        name: privateEndpointName
         properties: {
           privateLinkServiceId: cosmosDbAccount.id
           groupIds: [
             'Sql'
           ]
+          privateLinkServiceConnectionState: {
+            status: 'Approved'
+            actionsRequired: 'None'
+          }
+        }
+      }
+    ]
+    manualPrivateLinkServiceConnections: []
+    subnet: {
+      id: subnetId
+    }
+    customDnsConfigs: []
+  }
+}
+
+resource privateEndpoints_dnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-11-01' = {
+  parent: privateEndpoint
+  name: 'default'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'privatelink-documents-azure-com'
+        properties: {
+          privateDnsZoneId: privateDnsZone.id
         }
       }
     ]

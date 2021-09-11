@@ -41,8 +41,8 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     environment:environment
     appName:appName
     region:resourceGroup.location
-    virtualNetworkName:vNetDeploy.name
-    subnetName:subnetName_CosmosDb
+    virtualNetworkId:vNetDeploy.outputs.id
+    subnetId:vNetDeploy.outputs.id_subnet_cosmosdb
   }
 }
 
