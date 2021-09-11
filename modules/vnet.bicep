@@ -1,7 +1,6 @@
 //  Imported params
-param environment  string
-param appName  string
 param region string = resourceGroup().location
+param vnetName  string
 param subnetName_CosmosDb  string
 param subnetName_ACRegistry  string
 param subnetName_ApiApp  string
@@ -64,7 +63,7 @@ param subnets array = [
 
 // Resource Definition
 resource vNet 'Microsoft.Network/virtualNetworks@2021-02-01' ={
-  name:'vnet-${environment}-${region}-${appName}'
+  name:vnetName
   location:region
   properties: {
     addressSpace: {
@@ -74,18 +73,5 @@ resource vNet 'Microsoft.Network/virtualNetworks@2021-02-01' ={
   }
 }
 
-resource subnet_cosmosdb 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = {
-  parent: vNet
-  name: 'subnet-cosmosdb'
-  properties: {
-    addressPrefix: '192.168.4.0/27'
-    delegations: []
-    privateEndpointNetworkPolicies: 'Disabled'
-    privateLinkServiceNetworkPolicies: 'Enabled'
-  }
-}
-
 output id string = vNet.id
 output name string = vNet.name
-
-output id_subnet_cosmosdb string = subnet_cosmosdb.id

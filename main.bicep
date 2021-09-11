@@ -5,16 +5,19 @@ param environment  string
 param appName  string
 param includeNetworkSecurity  bool
 
-// Parameters - Constants
+// Parameters - Resource Names
 param subnetName_CosmosDb  string = 'subnet-cosmosdb'
 param subnetName_ACRegistry  string = 'subnet-acregistry'
 param subnetName_ApiApp  string = 'subnet-apiapp'
 param subnetName_WfeApp  string = 'subnet-wfeapp'
 param subnetName_FontDoor  string = 'subnet-frontdoor'
+var resourceGroupName  = 'rg-${appName}-${environment}'
+var vnetName  = 'vnet-${environment}-${deployment().location}-${appName}'
+var vNetId ='/subscriptions/${subscription().id}/resourceGroups/${resourceGroupName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
 
 // Deployment- Resource Group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
-  name:'rg-${appName}-${environment}'
+  name:resourceGroupName
   location:deployment().location
 }
 
@@ -23,9 +26,8 @@ module vNetDeploy 'modules/vnet.bicep' = {
   name: 'vNetDeploy'
   scope: resourceGroup
   params:{
-    environment:environment
-    appName:appName
     region:resourceGroup.location
+    vnetName:vnetName
     subnetName_CosmosDb:subnetName_CosmosDb
     subnetName_ACRegistry:subnetName_ACRegistry
     subnetName_ApiApp:subnetName_ApiApp
@@ -42,7 +44,7 @@ module appPlanDeploy 'modules/appPlan.bicep' = {
     environment:environment
     appName:appName
     region:resourceGroup.location
-    vNetName:vNetDeploy.outputs.name
+    vNetName:vnetName
     subnetName_ApiApp:subnetName_ApiApp
     subnetName_WfeApp:subnetName_WfeApp
   }
@@ -56,8 +58,9 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     environment:environment
     appName:appName
     region:resourceGroup.location
-    virtualNetworkId:vNetDeploy.outputs.id
-    subnetId:vNetDeploy.outputs.id_subnet_cosmosdb
+    virtualNetworkId:vNetId
+    virtualNetworkName:vnetName
+    subnetName:subnetName_CosmosDb
     apiAppPrincipalId:appPlanDeploy.outputs.apiAppPrincipalId
     includeNetworkSecurity:includeNetworkSecurity
   }
