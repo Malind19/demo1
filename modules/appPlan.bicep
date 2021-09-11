@@ -1,6 +1,8 @@
 // Imported params
 param environment  string
 param appName  string
+param includeNetworkSecurity  bool
+
 param region string = resourceGroup().location
 param subnetId_ApiAppConnect  string
 param subnetId_WfeAppConnect  string
@@ -55,7 +57,7 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
   }
 }
 
-resource apiAppPrivateNetwork 'Microsoft.Network/privateEndpoints@2021-02-01' =  {
+resource apiAppPrivateNetwork 'Microsoft.Network/privateEndpoints@2021-02-01' =  if(includeNetworkSecurity) {
   name: privateEndpointName
   location: region
   properties:{
@@ -76,5 +78,6 @@ resource apiAppPrivateNetwork 'Microsoft.Network/privateEndpoints@2021-02-01' = 
   }
 }
 
-output hostUrl string = wfeAppService.properties.defaultHostName
+output wfeHostName string = wfeAppService.properties.defaultHostName
+output wfeResourceId string = wfeAppService.id
 output apiAppPrincipalId string = apiAppService.identity.principalId

@@ -16,11 +16,14 @@ var subnetName_FontDoor = 'subnet-frontdoor'
 var resourceGroupName  = 'rg-${appName}-${environment}'
 var vnetName  = 'vnet-${environment}-${deployment().location}-${appName}'
 
+
 // Deployment- Resource Group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
   name:resourceGroupName
   location:deployment().location
 }
+
+var frontDoorEndpointName = 'afd-${uniqueString(resourceGroup.id)}'
 
 // Deployment - Virtual Network
 module vNetDeploy 'modules/vnet.bicep' = {
@@ -46,6 +49,7 @@ module appPlanDeploy 'modules/appPlan.bicep' = {
   params:{
     environment:environment
     appName:appName
+    includeNetworkSecurity:includeNetworkSecurity
     region:resourceGroup.location
     virtualNetworkName:vnetName
     subnetName:subnetName_ApiAppPvtEndpoint
@@ -81,12 +85,17 @@ module acRegistryDeploy 'modules/acRegistry.bicep' = {
 }
 
 // Deployment - Front Door
-// module frontDoorDeploy 'frontDoor.bicep' = {
-//   name: 'frontDoorDeploy'
-//   scope: resourceGroup
-//   params:{
-//     environment:environment
-//     appName:appName
-//     backendHostUrl:appPlanDeploy.outputs.hostUrl
-//   }
-// }
+module frontDoorDeploy 'modules/frontDoor.bicep' = {
+  name: 'frontDoorDeploy'
+  scope: resourceGroup
+  params: {
+    environment:environment
+    appName:appName
+    skuName: 'Premium_AzureFrontDoor'
+    endpointName: frontDoorEndpointName
+    originHostName: appPlanDeploy.outputs.wfeHostName
+    privateEndpointResourceId: appPlanDeploy.outputs.wfeResourceId
+    privateLinkResourceType: 'sites' 
+    privateEndpointLocation: resourceGroup.location
+  }
+}
