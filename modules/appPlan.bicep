@@ -2,6 +2,9 @@
 param environment  string
 param appName  string
 param includeNetworkSecurity  bool
+param cosmosDBAccountName string
+param cosmosDBName string
+param cosmosDBContainers_Employees string
 
 param region string = resourceGroup().location
 param subnetId_ApiAppConnect  string
@@ -40,6 +43,32 @@ resource apiAppService 'Microsoft.Web/sites@2021-01-15' = {
     siteConfig: {
       linuxFxVersion: linuxFxVersion
       vnetRouteAllEnabled:true
+      appSettings:[
+        {
+          name: 'subscription_Id'
+          value: subscription().subscriptionId
+        }
+        {
+          name:'resourceGroup_Name'
+          value:resourceGroup().name
+        }
+        {
+          name:'cosmosDB_AccountName'
+          value:cosmosDBAccountName
+        }
+        {
+          name:'cosmosDB_Endpoint'
+          value:'https://${cosmosDBAccountName}.documents.azure.com:443/'
+        }
+        {
+          name:'cosmosDB_Name'
+          value:cosmosDBName
+        }
+        {
+          name:'cosmosDB_Containers_Employees'
+          value:cosmosDBContainers_Employees
+        }
+      ]
     }
     virtualNetworkSubnetId:subnetId_ApiAppConnect
   }
@@ -54,6 +83,12 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
     siteConfig: {
       linuxFxVersion: linuxFxVersion
       vnetRouteAllEnabled:true
+      appSettings:[
+        {
+          name: 'apiApp_HostUrl'
+          value: apiAppService.properties.defaultHostName
+        }
+      ]
     }
     virtualNetworkSubnetId:subnetId_WfeAppConnect
   }

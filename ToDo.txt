@@ -1,0 +1,8 @@
+1. Add Log Analytics Workspace
+2. Setup Front Door Routing
+3. Add Private Link to WFE
+4. Enable Poortal Access to Cosmos DB
+5. Setup Identity to ACR
+
+Watch Out
+1. Ticket on Identity of Api App to CosmosDB

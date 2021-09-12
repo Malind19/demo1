@@ -17,6 +17,9 @@ var subnetName_FontDoor = 'subnet-frontdoor'
 var resourceGroupName  = 'rg-${appName}-${environment}'
 var vnetName  = 'vnet-${environment}-${appName}'
 
+var cosmosDBAccountName = 'cosmos-${appName}-${environment}'
+var cosmosDBName = 'db-${appName}'
+var cosmosDBContainers_Employees =  'Employees'
 
 // Deployment- Resource Group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
@@ -56,6 +59,9 @@ module appPlanDeploy 'modules/appPlan.bicep' = {
     subnetName:subnetName_ApiAppPvtEndpoint
     subnetId_ApiAppConnect:vNetDeploy.outputs.subnetId_ApiAppConnect
     subnetId_WfeAppConnect:vNetDeploy.outputs.subnetId_WfeAppConnect
+    cosmosDBAccountName:cosmosDBAccountName
+    cosmosDBName:cosmosDBName
+    cosmosDBContainers_Employees:cosmosDBContainers_Employees
   }
 }
 
@@ -71,6 +77,9 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     subnetName:subnetName_CosmosPvtEndpoint
     apiAppPrincipalId:appPlanDeploy.outputs.apiAppPrincipalId
     includeNetworkSecurity:includeSecurity
+    cosmosDBAccountName:cosmosDBAccountName
+    cosmosDBName: cosmosDBName
+    cosmosDBContainers_Employees:cosmosDBContainers_Employees
   }
 }
 

@@ -2,6 +2,9 @@
 param environment  string
 param appName  string
 param includeNetworkSecurity  bool
+param cosmosDBAccountName string
+param cosmosDBName string
+param cosmosDBContainers_Employees string
 
 param region string = resourceGroup().location
 param subnetName  string
@@ -9,7 +12,6 @@ param virtualNetworkName  string
 param apiAppPrincipalId  string
 
 // Local params
-param employeeContainerName string = 'Employees'
 param privateEndpointName string = 'pe-cosmos-${appName}-${environment}'
 param tags object = {
   'deploymentGroup':'cosmosdb'
@@ -26,7 +28,7 @@ var privateDnsZoneName = 'privatelink.documents.azure.com'
 
 // Deployments - Coosmos DB Resources 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2021-04-15' = {
-  name: 'cosmos-${appName}-${environment}'
+  name: cosmosDBAccountName
   tags:tags
   location: region
   properties:{
@@ -47,7 +49,7 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2021-04-15' = {
 }
 
 resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2021-06-15' = {
-  name: '${cosmosDbAccount.name}/db-${appName}'
+  name: '${cosmosDbAccount.name}/${cosmosDBName}'
   tags: tags
   dependsOn: [
     cosmosDbAccount
@@ -60,7 +62,7 @@ resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2021-06-15
 }
 
 resource employeesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2021-06-15' = {
-  name:'${cosmosDb.name}/${employeeContainerName}'
+  name:'${cosmosDb.name}/${cosmosDBContainers_Employees}'
   tags:tags
   dependsOn: [
     cosmosDbAccount
@@ -68,7 +70,7 @@ resource employeesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
   ]
   properties:{
     resource:{
-      id: employeeContainerName
+      id: cosmosDBContainers_Employees
       partitionKey:{
         paths:[
           '/id'
