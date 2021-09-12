@@ -1,8 +1,12 @@
 1. Add Log Analytics Workspace
-2. Setup Front Door Routing
-3. Add Private Link to WFE
-4. Enable Poortal Access to Cosmos DB
-5. Setup Identity to ACR
+2. Enable Poortal Access to Cosmos DB
+3. Setup Identity to ACR
+4. Check continous deployment
+5. Fix container image issues
+
+Extra
+1. Java Cosmos check
+2. Show expected diagram vs implemented (Front Door and NSGs)
 
 Watch Out
 1. Ticket on Identity of Api App to CosmosDB

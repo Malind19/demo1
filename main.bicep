@@ -21,6 +21,8 @@ var cosmosDBAccountName = 'cosmos-${appName}-${environment}'
 var cosmosDBName = 'db-${appName}'
 var cosmosDBContainers_Employees =  'Employees'
 
+var containerRegistryName =  'cr${appName}${environment}'
+
 // Deployment- Resource Group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
   name:resourceGroupName
@@ -43,6 +45,16 @@ module vNetDeploy 'modules/vnet.bicep' = {
     subnetName_WfeAppConnect:subnetName_WfeAppConnect
     subnetName_ACRegistry:subnetName_ACRegistry
     subnetName_FontDoor:subnetName_FontDoor
+  }
+}
+
+// Deployment - Container Registry
+module acRegistryDeploy 'modules/acRegistry.bicep' = {
+  name: 'acRegistryDeploy'
+  scope: resourceGroup
+  params:{
+    containerRegistryName:containerRegistryName
+    region:resourceGroup.location
   }
 }
 
@@ -80,32 +92,5 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     cosmosDBAccountName:cosmosDBAccountName
     cosmosDBName: cosmosDBName
     cosmosDBContainers_Employees:cosmosDBContainers_Employees
-  }
-}
-
-// Deployment - Container Registry
-module acRegistryDeploy 'modules/acRegistry.bicep' = {
-  name: 'acRegistryDeploy'
-  scope: resourceGroup
-  params:{
-    environment:environment
-    appName:appName
-    region:resourceGroup.location
-  }
-}
-
-// Deployment - Front Door
-module frontDoorDeploy 'modules/frontDoor.bicep' = if(includeSecurity) {
-  name: 'frontDoorDeploy'
-  scope: resourceGroup
-  params: {
-    environment:environment
-    appName:appName
-    skuName: 'Premium_AzureFrontDoor'
-    endpointName: frontDoorEndpointName
-    originHostName: appPlanDeploy.outputs.wfeHostName
-    privateEndpointResourceId: appPlanDeploy.outputs.wfeResourceId
-    privateLinkResourceType: 'sites' 
-    privateEndpointLocation: resourceGroup.location
   }
 }
