@@ -145,7 +145,7 @@ resource privateDnsZone_A_1 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
   name: 'app-app22-d5-api'
   properties: {
     metadata: {
-      creator: 'created by private endpoint pe-apiApp with resource guid 9618406f-65ef-47ff-83bf-7a6da5ffd49e'
+      creator: 'created by Pipeline'
     }
     ttl: 10
     aRecords: [
@@ -161,7 +161,7 @@ resource privateDnsZone_A_2 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
   name: 'app-app22-d5-api.scm'
   properties: {
     metadata: {
-      creator: 'created by private endpoint pe-apiApp with resource guid 9618406f-65ef-47ff-83bf-7a6da5ffd49e'
+      creator: 'created by Pipeline'
     }
     ttl: 10
     aRecords: [
