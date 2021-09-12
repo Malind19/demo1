@@ -107,7 +107,7 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2018-09-01' = if(incl
   location: 'global'
 }
 
-resource apiAppPvtDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-11-01' = {
+resource apiAppPvtDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-11-01' =  if(includeNetworkSecurity) {
   parent: privateEndpoint
   dependsOn:[
     privateDnsZone

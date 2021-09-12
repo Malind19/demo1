@@ -14,7 +14,7 @@ param virtualNetworkName  string
 
 // Local params
 param sku  string = 'P1V2'
-param linuxFxVersion string = 'node|14-lts'
+param linuxFxVersion string = 'DOCKER|nginx:alpine'
 param privateEndpointName string = 'pe-apiapp-${appName}-${environment}'
 var privateDnsZoneName = 'privatelink.azurewebsites.net'
 
@@ -95,7 +95,7 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
 }
 
 // Deployments - Private Endpoint and Networking
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-02-01' =  if(includeNetworkSecurity) {
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-02-01' = if(includeNetworkSecurity) {
   name: privateEndpointName
   location: region
   properties:{
@@ -116,12 +116,12 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-02-01' =  if(i
   }
 }
 
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2018-09-01' = if(includeNetworkSecurity) {
   name: privateDnsZoneName
   location: 'global'
 }
 
-resource apiAppPvtDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-11-01' = {
+resource apiAppPvtDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-11-01' = if(includeNetworkSecurity) {
   parent: privateEndpoint
   dependsOn:[
     privateDnsZone
@@ -140,7 +140,7 @@ resource apiAppPvtDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZo
   }
 }
 
-resource privateDnsZone_A_1 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
+resource privateDnsZone_A_1 'Microsoft.Network/privateDnsZones/A@2018-09-01' = if(includeNetworkSecurity) {
   parent: privateDnsZone
   name: 'app-app22-d5-api'
   properties: {
@@ -156,7 +156,7 @@ resource privateDnsZone_A_1 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
   }
 }
 
-resource privateDnsZone_A_2 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
+resource privateDnsZone_A_2 'Microsoft.Network/privateDnsZones/A@2018-09-01' = if(includeNetworkSecurity) {
   parent: privateDnsZone
   name: 'app-app22-d5-api.scm'
   properties: {
@@ -172,7 +172,7 @@ resource privateDnsZone_A_2 'Microsoft.Network/privateDnsZones/A@2018-09-01' = {
   }
 }
 
-resource privateDnsZone_SOA 'Microsoft.Network/privateDnsZones/SOA@2018-09-01' = {
+resource privateDnsZone_SOA 'Microsoft.Network/privateDnsZones/SOA@2018-09-01' = if(includeNetworkSecurity) {
   parent: privateDnsZone
   name: '@'
   properties: {
@@ -189,7 +189,7 @@ resource privateDnsZone_SOA 'Microsoft.Network/privateDnsZones/SOA@2018-09-01' =
   }
 }
 
-resource vnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
+resource vnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = if(includeNetworkSecurity) {
   parent: privateDnsZone
   name: '1cf36ceee22f5'
   location: 'global'
