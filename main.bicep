@@ -29,7 +29,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
   location:deployment().location
 }
 
-var frontDoorEndpointName = 'afd-${uniqueString(resourceGroup.id)}'
+var frontDoorEndpointName = 'afd-${appName}-${environment}'
 
 // Deployment - Virtual Network
 module vNetDeploy 'modules/vnet.bicep' = {
@@ -74,6 +74,7 @@ module appPlanDeploy 'modules/appPlan.bicep' = {
     cosmosDBAccountName:cosmosDBAccountName
     cosmosDBName:cosmosDBName
     cosmosDBContainers_Employees:cosmosDBContainers_Employees
+    containerRegistryName:containerRegistryName
   }
 }
 

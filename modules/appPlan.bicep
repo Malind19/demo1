@@ -11,16 +11,16 @@ param subnetId_ApiAppConnect  string
 param subnetId_WfeAppConnect  string
 param subnetName  string
 param virtualNetworkName  string
+param containerRegistryName  string
 
 // Local params
 param sku  string = 'P1V2'
-param linuxFxVersion string = 'DOCKER|nginx:alpine'
 param privateEndpointName string = 'pe-apiapp-${appName}-${environment}'
 var privateDnsZoneName = 'privatelink.azurewebsites.net'
 
 // Deployments - App Plan and App Services
 resource  appPlan 'Microsoft.Web/serverfarms@2021-01-15' ={
-  name:'plan-${environment}-${region}-${appName}'
+  name:'plan-${environment}-${appName}'
   location: region
   kind:'linux'
   sku:{
@@ -41,7 +41,7 @@ resource apiAppService 'Microsoft.Web/sites@2021-01-15' = {
     serverFarmId: appPlan.id
     httpsOnly:true
     siteConfig: {
-      linuxFxVersion: linuxFxVersion
+      linuxFxVersion: 'DOCKER|${containerRegistryName}.azurecr.io/springdataapi:latest'
       vnetRouteAllEnabled:true
       appSettings:[
         {
@@ -81,7 +81,7 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
     serverFarmId: appPlan.id
     httpsOnly:true
     siteConfig: {
-      linuxFxVersion: linuxFxVersion
+      linuxFxVersion: 'DOCKER|${containerRegistryName}.azurecr.io/springdatawfe:latest'
       vnetRouteAllEnabled:true
       appSettings:[
         {
