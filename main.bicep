@@ -94,3 +94,19 @@ module cosmosDbDeploy 'modules/cosmos.bicep' = {
     cosmosDBContainers_Employees:cosmosDBContainers_Employees
   }
 }
+
+// Deployment - Front Door
+module frontDoorDeploy 'modules/frontDoor.bicep' = if(includeSecurity) {
+  name: 'frontDoorDeploy'
+  scope: resourceGroup
+  params: {
+    environment:environment
+    appName:appName
+    skuName: 'Premium_AzureFrontDoor'
+    endpointName: frontDoorEndpointName
+    originHostName: appPlanDeploy.outputs.wfeHostName
+    privateEndpointResourceId: appPlanDeploy.outputs.wfeResourceId
+    privateLinkResourceType: 'sites' 
+    privateEndpointLocation: resourceGroup.location
+  }
+}

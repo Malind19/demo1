@@ -5,8 +5,9 @@
 5. Fix container image issues
 
 Extra
+1. Check front door auto approval
 1. Java Cosmos check
-2. Show expected diagram vs implemented (Front Door and NSGs)
+2. Show expected diagram vs implemented (Front Door, App Configuration and NSGs)
 
 Watch Out
 1. Ticket on Identity of Api App to CosmosDB
