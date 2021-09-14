@@ -77,6 +77,9 @@ resource apiAppService 'Microsoft.Web/sites@2021-01-15' = {
 resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
   name: 'app-${appName}-${environment}-wfe'
   location: region
+  identity:{
+    type:'SystemAssigned'
+  }
   properties: {
     serverFarmId: appPlan.id
     httpsOnly:true
@@ -86,7 +89,7 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
       appSettings:[
         {
           name: 'apiApp_HostUrl'
-          value: 'https://{apiAppService.properties.defaultHostName}'
+          value: 'https://${apiAppService.properties.defaultHostName}'
         }
       ]
     }
