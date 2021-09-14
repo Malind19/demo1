@@ -86,7 +86,7 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
       appSettings:[
         {
           name: 'apiApp_HostUrl'
-          value: apiAppService.properties.defaultHostName
+          value: 'https://{apiAppService.properties.defaultHostName}'
         }
       ]
     }
