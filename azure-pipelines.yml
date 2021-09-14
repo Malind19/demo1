@@ -13,7 +13,7 @@ steps:
 - task: AzureCLI@2  
   displayName: 'build bicep artifact' 
   inputs: 
-    azureSubscription: 'AZDevOpsPrincipal' 
+    azureSubscription: 'ArmConnection' 
     scriptType: 'pscore'  
     scriptLocation: 'inlineScript'  
     inlineScript: 'az bicep build --file main.bicep'
