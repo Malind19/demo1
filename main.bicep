@@ -23,6 +23,9 @@ var cosmosDBContainers_Employees =  'Employees'
 
 var containerRegistryName =  'cr${appName}${environment}'
 
+var logAnalyticsNamespaceName =  'loga-${appName}${environment}'
+var appInsightsName =  'appi-${appName}${environment}'
+
 // Deployment- Resource Group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ={
   name:resourceGroupName
@@ -58,6 +61,15 @@ module acRegistryDeploy 'modules/acRegistry.bicep' = {
   }
 }
 
+// Deployment - Front Door
+module logAnalytics 'modules/logAnalytics.bicep' = {
+  name: 'logAnalytics'
+  scope: resourceGroup
+  params: {
+    logAnalyticsNamespaceName:logAnalyticsNamespaceName
+  }
+}
+
 // Deployment - App Service Plan
 module appPlanDeploy 'modules/appPlan.bicep' = {
   name: 'appPlanDeploy'
@@ -75,6 +87,8 @@ module appPlanDeploy 'modules/appPlan.bicep' = {
     cosmosDBName:cosmosDBName
     cosmosDBContainers_Employees:cosmosDBContainers_Employees
     containerRegistryName:containerRegistryName
+    appInsightsName:appInsightsName
+    logAnalyticsWorkspaceId:logAnalytics.outputs.logAnalyticsWorkspaceId
   }
 }
 

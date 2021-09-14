@@ -13,6 +13,9 @@ param subnetName  string
 param virtualNetworkName  string
 param containerRegistryName  string
 
+param appInsightsName  string
+param logAnalyticsWorkspaceId  string
+
 // Local params
 param sku  string = 'P1V2'
 param privateEndpointName string = 'pe-apiapp-${appName}-${environment}'
@@ -34,6 +37,9 @@ resource  appPlan 'Microsoft.Web/serverfarms@2021-01-15' ={
 resource apiAppService 'Microsoft.Web/sites@2021-01-15' = {
   name: 'app-${appName}-${environment}-api'
   location: region
+  dependsOn:[
+    appInsights
+  ]
   identity:{
     type:'SystemAssigned'
   }
@@ -68,6 +74,18 @@ resource apiAppService 'Microsoft.Web/sites@2021-01-15' = {
           name:'cosmosDB_Containers_Employees'
           value:cosmosDBContainers_Employees
         }
+        {
+          name:'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value:appInsights.properties.InstrumentationKey
+        }
+        {
+          name:'ApplicationInsightsAgent_EXTENSION_VERSION'
+          value:'~3'
+        }
+        {
+          name:'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value:appInsights.properties.ConnectionString
+        }
       ]
     }
     virtualNetworkSubnetId:subnetId_ApiAppConnect
@@ -91,9 +109,84 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
           name: 'apiApp_HostUrl'
           value: 'https://${apiAppService.properties.defaultHostName}'
         }
+        {
+          name:'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value:appInsights.properties.InstrumentationKey
+        }
+        {
+          name:'ApplicationInsightsAgent_EXTENSION_VERSION'
+          value:'~3'
+        }
+        {
+          name:'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value:appInsights.properties.ConnectionString
+        }
       ]
     }
     virtualNetworkSubnetId:subnetId_WfeAppConnect
+  }
+}
+
+// Deployments - Application Insights
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: appInsightsName
+  location: region
+  kind: 'string'
+  tags: {
+    displayName: 'AppInsight'
+    ProjectName: appName
+  }
+  properties: {
+    Application_Type: 'web'
+    WorkspaceResourceId: logAnalyticsWorkspaceId
+  }
+}
+
+resource appServiceSiteExtension 'Microsoft.Web/sites/config@2020-06-01' = {
+  parent: apiAppService
+  name: 'logs'
+  properties: {
+    applicationLogs: {
+      fileSystem: {
+        level: 'Warning'
+      }
+    }
+    httpLogs: {
+      fileSystem: {
+        retentionInMb: 40
+        enabled: true
+      }
+    }
+    failedRequestsTracing: {
+      enabled: true
+    }
+    detailedErrorMessages: {
+      enabled: true
+    }
+  }
+}
+
+resource wfeServiceSiteExtension 'Microsoft.Web/sites/config@2020-06-01' = {
+  parent: wfeAppService
+  name: 'logs'
+  properties: {
+    applicationLogs: {
+      fileSystem: {
+        level: 'Warning'
+      }
+    }
+    httpLogs: {
+      fileSystem: {
+        retentionInMb: 40
+        enabled: true
+      }
+    }
+    failedRequestsTracing: {
+      enabled: true
+    }
+    detailedErrorMessages: {
+      enabled: true
+    }
   }
 }
 

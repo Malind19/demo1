@@ -1,2 +1,0 @@
-1. Log Analytics
-3. Documentation
