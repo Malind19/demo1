@@ -84,7 +84,7 @@ resource wfeAppService 'Microsoft.Web/sites@2021-01-15' = {
     serverFarmId: appPlan.id
     httpsOnly:true
     siteConfig: {
-      linuxFxVersion: 'DOCKER|${containerRegistryName}.azurecr.io/springdatawfe:latest'
+      linuxFxVersion: 'DOCKER|${containerRegistryName}.azurecr.io/springdatafe:latest'
       vnetRouteAllEnabled:true
       appSettings:[
         {

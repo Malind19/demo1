@@ -1,8 +1,2 @@
-1. Add Log Analytics Workspace
-2. Enable Poortal Access to Cosmos DB
-
-Extra
-2. Show expected diagram vs implemented (Front Door, App Configuration and NSGs)
-
-Watch Out
-1. Ticket on Identity of Api App to CosmosDB
+1. Log Analytics
+3. Documentation
